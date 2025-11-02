@@ -1,7 +1,7 @@
 
 type t = {
   v : float;
-  g : float;
+  mutable g : float;
   op : op option;
 }
 and 
@@ -34,6 +34,37 @@ let ( *! ) x y =
     g = 0.;
     op = Some (Mul (x, y)) 
   }
+
+let ( =! ) x y = (x.v = y.v)
+
+(* 
+f = y * (x + y) 
+
+-> f = y * (g) with g = x + y
+-> df/dy = 1 * (g) + y * dg/dy 
+*)
+
+let backward z =
+  let rec aux node = 
+    match node.op with 
+    | None -> begin end
+    | Some f -> begin
+      match f with
+      | Add (a, b) -> begin
+        a.g <- a.g +. node.g;
+        b.g <- b.g +. node.g;
+        aux a; aux b; 
+        end
+      | Mul (a, b) -> begin
+        a.g <- a.g +. b.v *. node.g;
+        b.g <- b.g +. a.v *. node.g;
+        aux a; aux b;
+        end
+      end
+  in
+  z.g <- 1.0;
+  aux z
+  
 
 let string_history x = 
   match x.op with
