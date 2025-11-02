@@ -1,0 +1,3 @@
+(test
+ (name oddx_test)
+ (libraries oddx))

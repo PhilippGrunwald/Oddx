@@ -1,0 +1,3 @@
+(library
+ (name oddx)
+ (public_name oddx))
