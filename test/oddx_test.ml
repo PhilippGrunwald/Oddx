@@ -70,6 +70,12 @@ let () =
   backward f;
   assert(get_grad x = -1. *. Float.exp(-2.));
   assert(get_grad y = 2. *. Float.exp(-2.));
+
+  let x = init 3.5 in
+  let f = init 1. /! (init 1. +! oddx_exp(init 0. -! x) ) in
+  backward f;
+  assert(get_grad x = 1. /. (Float.exp 3.5 *. (1. +. Float.exp(-3.5)) ** 2.0));
+  
   
   
   

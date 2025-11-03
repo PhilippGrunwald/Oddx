@@ -1,5 +1,7 @@
 type oddx_fun = 
   | Oddx_Exp
+  | Oddx_Sin
+  | Oddx_Cos
 
 
 
@@ -77,10 +79,14 @@ let ( =! ) x y = (x.v = y.v)
 let calc_oddx_fun oddx_function x = 
   match oddx_function with
   | Oddx_Exp -> Float.exp x
+  | Oddx_Sin -> Float.sin x
+  | Oddx_Cos -> Float.cos x
 
 let calc_oddx_fun_der oddx_function x = 
   match oddx_function with
   | Oddx_Exp -> Float.exp x
+  | Oddx_Sin -> Float.cos x
+  | Oddx_Cos -> -1. *. Float.sin x
 
 let generic_user_fun oddx_function a = 
   {
@@ -90,6 +96,8 @@ let generic_user_fun oddx_function a =
   }
 
 let oddx_exp a = generic_user_fun Oddx_Exp a
+let oddx_sin a = generic_user_fun Oddx_Sin a
+let oddx_cos a = generic_user_fun Oddx_Cos a
 
 
 let rec flush node = 
