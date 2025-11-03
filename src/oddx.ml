@@ -1,3 +1,7 @@
+type oddx_fun = 
+  | Oddx_Exp
+
+
 
 type t = {
   v : float;
@@ -10,8 +14,11 @@ op =
   | Minus of t * t
   | Mul of t * t
   | Frac of t * t
+  | OddxFun of oddx_fun * t
 
 
+
+(* ------------------------------ utils ------------------------------- *)
 
 let init f = 
   {
@@ -24,6 +31,14 @@ let get_val x = x.v
 
 let get_grad x = x.g
 
+let string_history x = 
+  match x.op with
+  | None -> "No history"
+  | Some _ -> "history"
+
+
+
+(* ---------------------------- operators ------------------------- *)
 let ( +! ) x y = 
   {
     v = x.v +. y.v;
@@ -55,17 +70,44 @@ let ( /! ) x y =
 
 let ( =! ) x y = (x.v = y.v)
 
-(* 
-f = y * (x + y) 
 
--> f = y * (g) with g = x + y
--> df/dy = 1 * (g) + y * dg/dy 
-*)
+
+(* ----------------------------- functions -------------------------------- *)
+
+let calc_oddx_fun oddx_function x = 
+  match oddx_function with
+  | Oddx_Exp -> Float.exp x
+
+let calc_oddx_fun_der oddx_function x = 
+  match oddx_function with
+  | Oddx_Exp -> Float.exp x
+
+let generic_user_fun oddx_function a = 
+  {
+    v = calc_oddx_fun oddx_function a.v;
+    g = 0.;
+    op = Some (OddxFun (oddx_function, a))
+  }
+
+let oddx_exp a = generic_user_fun Oddx_Exp a
+
+
+let rec flush node = 
+  match node.op with
+  | None -> node.g <- 0.;
+  | Some formula ->
+    match formula with
+    | Add(a, b) | Mul (a, b) | Minus (a, b) | Frac (a, b) -> begin
+      node.g <- 0.;
+      flush a; flush b
+      end
+    | OddxFun (_, a) -> flush a
+
 
 let backward z =
   let rec aux node = 
     match node.op with 
-    | None -> begin end
+    | None -> ();
     | Some f -> begin
       match f with
       | Add (a, b) -> begin
@@ -88,14 +130,12 @@ let backward z =
         b.g <- b.g -. a.v /. (b.v *. b.v) *. node.g;
         aux a; aux b;
         end
+      | OddxFun (f, a) -> begin
+        a.g <- a.g +. (calc_oddx_fun_der f a.v) *. node.g;
+        aux a;
+        end
       end
   in
+  flush z;
   z.g <- 1.0;
   aux z
-  
-
-let string_history x = 
-  match x.op with
-  | None -> "No history"
-  | Some _ -> "history"
-

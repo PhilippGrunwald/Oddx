@@ -54,4 +54,23 @@ let () =
   assert(get_grad a = -24. /. (16. *. 9.));
   assert(get_grad b = -8. /. (16. *. 9.));
   
+  backward f;
+  assert(get_grad a = -24. /. (16. *. 9.));
+  assert(get_grad b = -8. /. (16. *. 9.));
+
+
+  (* -----------------------functions ----------------- *)
+  let x = init 1. in
+  let f = oddx_exp x in
+  backward f;
+  assert(get_grad x = Float.exp(1.));
+  let x = init 2. in
+  let y = init (-1.) in
+  let f = oddx_exp @@ x *! y in
+  backward f;
+  assert(get_grad x = -1. *. Float.exp(-2.));
+  assert(get_grad y = 2. *. Float.exp(-2.));
+  
+  
+  
   Printf.printf "All tests passed!\n";

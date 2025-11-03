@@ -16,7 +16,11 @@ val ( /! ) : t -> t -> t
 
 val ( =! ) : t -> t -> bool
 
+val oddx_exp : t -> t
+
 val backward : t -> unit
+
+val flush : t -> unit
 
 val string_history : t -> string
 
