@@ -44,7 +44,7 @@ let () =
   assert(get_grad a = 1. /. (-3.));
   assert(get_grad b = -2. /. (9.));
   
-  
+
   let a = init 2. in
   let b = init (-3.) in
   let f = (a +! b) /! (a *! a *! b) in
@@ -77,6 +77,13 @@ let () =
   assert(get_grad x = 1. /. (Float.exp 3.5 *. (1. +. Float.exp(-3.5)) ** 2.0));
   
   
-  
+  (* -------------------- Power operator ----------------- *)
+  let a = init 2. in 
+  let b = init (-3.) in
+  let f = a ^! b in
+  backward f;
+  assert(get_grad a = -3. *. 2. ** (-4.));
+  assert(get_grad b = Float.log(2.) *. 2. ** (-3.));
+
   
   Printf.printf "All tests passed!\n";
